@@ -19,7 +19,7 @@
     "commands": [
       {
         "command": "extension.useState",
-        "title": "Insert useState line"
+        "title": "usestate: Insert useState line"
       }
     ]
   },
