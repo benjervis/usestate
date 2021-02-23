@@ -4,6 +4,7 @@
   "description": "",
   "version": "0.0.1",
   "publisher": "benjervis",
+  "repository": "github:benjervis/usestate",
   "engines": {
     "vscode": "^1.40.0"
   },
