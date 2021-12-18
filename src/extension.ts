@@ -2,6 +2,13 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+const normalizeDefaultValue = (defaultValue: string, type: string) => {
+  if (type === 'string') {
+    return `"${defaultValue}"`;
+  }
+  return defaultValue;
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -15,19 +22,26 @@ export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand(
     'extension.useState',
     async () => {
-      const variableName = await vscode.window.showInputBox({
-        placeHolder: 'Your variable name',
-      });
+      const input = await vscode.window.showInputBox({
+        placeHolder: 'Variable name[ DefaultValue [Type]]',
+      }) || '';
+      const [variableName = '', defaultValue = '', ...rest] = input.split(' ');
+      const type = rest.join(' ').trim();
 
-      const editor = vscode.window.activeTextEditor;
-      if (editor && variableName) {
-        const start = editor.selection.start;
+      if (variableName) {
         const capitalized = [
           variableName[0].toUpperCase(),
           variableName.slice(1),
         ].join('');
-        const useStateLine = `const [${variableName}, set${capitalized}] = useState();`;
-        editor.edit(builder => builder.insert(start, useStateLine));
+        let useStateLine = `const [${variableName}, set${capitalized}] = useState`;
+        useStateLine += type ? `<${type}>` : '';
+        useStateLine += `(${normalizeDefaultValue(defaultValue, type)});`;
+  
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+          const start = editor.selection.start;
+          editor.edit(builder => builder.insert(start, useStateLine));
+        }
       }
     },
   );
